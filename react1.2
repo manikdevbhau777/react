@@ -1,36 +1,62 @@
-class Person {
-  constructor(name, age) {
-    this.name = name;
-    this.age = age;
-  }
-  displayInfo() {
-    console.log(`Name: ${this.name}, Age: ${this.age}`);
-  }
+import React, { useState } from 'react';
+import { createRoot } from 'react-dom/client';
+
+function App() {
+  const [books, setBooks] = useState([
+    { title: '1984', author: 'George Orwell' },
+    { title: 'Harry Potter', author: 'J.K. Rowling' },
+    { title: 'The Hobbit', author: 'J.R.R. Tolkien' }
+  ]);
+  const [search, setSearch] = useState('');
+  const [newBook, setNewBook] = useState({ title: '', author: '' });
+
+  const filteredBooks = books.filter(b =>
+    b.title.toLowerCase().includes(search.toLowerCase()) ||
+    b.author.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const addBook = () => {
+    if (!newBook.title || !newBook.author) return;
+    setBooks([...books, newBook]);
+    setNewBook({ title: '', author: '' });
+  };
+
+  const removeBook = index => setBooks(books.filter((_, i) => i !== index));
+
+  return (
+    <div style={{ padding: 20, fontFamily: 'Arial' }}>
+      <h1>Library Management</h1>
+      <input
+        placeholder="Search by title or author"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        style={{ padding: 5, marginBottom: 10, width: 300 }}
+      />
+      <div style={{ marginBottom: 20 }}>
+        <input
+          placeholder="Book Title"
+          value={newBook.title}
+          onChange={e => setNewBook({ ...newBook, title: e.target.value })}
+          style={{ padding: 5, marginRight: 5 }}
+        />
+        <input
+          placeholder="Author"
+          value={newBook.author}
+          onChange={e => setNewBook({ ...newBook, author: e.target.value })}
+          style={{ padding: 5, marginRight: 5 }}
+        />
+        <button onClick={addBook} style={{ padding: 5 }}>Add Book</button>
+      </div>
+      <ul>
+        {filteredBooks.map((b, i) => (
+          <li key={i} style={{ marginBottom: 5 }}>
+            <strong>{b.title}</strong> by {b.author}
+            <button onClick={() => removeBook(i)} style={{ marginLeft: 10, padding: '2px 5px' }}>Remove</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-class Student extends Person {
-  constructor(name, age, course) {
-    super(name, age);
-    this.course = course;
-  }
-  displayInfo() {
-    console.log(`Student Name: ${this.name}, Age: ${this.age}, Course: ${this.course}`);
-  }
-}
-
-class Teacher extends Person {
-  constructor(name, age, subject) {
-    super(name, age);
-    this.subject = subject;
-  }
-  displayInfo() {
-    console.log(`Teacher Name: ${this.name}, Age: ${this.age}, Subject: ${this.subject}`);
-  }
-}
-
-// Example usage
-const student1 = new Student('Alice', 20, 'Computer Science');
-const teacher1 = new Teacher('Mr. Smith', 45, 'Mathematics');
-
-student1.displayInfo();
-teacher1.displayInfo();
+createRoot(document.getElementById('root')).render(<App />);
